@@ -93,6 +93,17 @@ export const SEASONAL_QUERY = /* GraphQL */ `
   ${MEDIA_CARD_FIELDS}
 `;
 
+export const SEARCH_QUERY = /* GraphQL */ `
+  query Search($q: String!) {
+    Page(page: 1, perPage: 30) {
+      media(search: $q, type: ANIME, sort: SEARCH_MATCH, isAdult: false) {
+        ...MediaCardFields
+      }
+    }
+  }
+  ${MEDIA_CARD_FIELDS}
+`;
+
 export const MEDIA_BY_IDS_QUERY = /* GraphQL */ `
   query MediaByIds($ids: [Int]!) {
     Page(page: 1, perPage: 50) {

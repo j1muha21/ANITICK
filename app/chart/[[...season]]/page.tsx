@@ -8,6 +8,7 @@ import { fetchAniList } from "@/lib/anilist/client";
 import { SEASONAL_QUERY } from "@/lib/anilist/queries";
 import type { MediaCard, PageInfo } from "@/lib/anilist/types";
 import { getTrackedIds } from "@/lib/list";
+import { getPrefs } from "@/lib/prefs";
 import { getUser } from "@/lib/session";
 import type { ChartSort, SeasonRef } from "@/lib/season";
 import { CHART_SORTS, FORMATS, GENRES, currentSeason, parseSeasonSlug, seasonLabel } from "@/lib/season";
@@ -74,11 +75,14 @@ export default async function ChartPage({ params, searchParams }: PageProps) {
   const genre = query.genre && GENRES.includes(query.genre) ? query.genre : null;
   const sort: ChartSort =
     query.sort && query.sort in CHART_SORTS ? (query.sort as ChartSort) : "POPULARITY_DESC";
-  const view = query.view === "list" ? "list" : "grid";
 
   const [media, user] = await Promise.all([fetchSeason(ref, format, genre, sort), getUser()]);
   const canAdd = Boolean(user);
   const trackedIds = new Set(user ? await getTrackedIds(user.id) : []);
+
+  // Explicit ?view= wins; otherwise fall back to the user's saved preference.
+  const prefView = user ? (await getPrefs(user.id)).defaultView : "grid";
+  const view = query.view === "list" ? "list" : query.view === "grid" ? "grid" : prefView;
 
   return (
     <div>

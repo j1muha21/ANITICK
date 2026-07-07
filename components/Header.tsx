@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getUser } from "@/lib/session";
+import SearchBar from "@/components/SearchBar";
 import UserMenu from "@/components/UserMenu";
 
 export default async function Header() {
@@ -19,12 +20,18 @@ export default async function Header() {
             Seasonal Chart
           </Link>
           {user && (
-            <Link href="/dashboard" className="transition-colors hover:text-foreground">
-              My Countdowns
-            </Link>
+            <>
+              <Link href="/dashboard" className="transition-colors hover:text-foreground">
+                My Countdowns
+              </Link>
+              <Link href="/calendar" className="transition-colors hover:text-foreground">
+                Calendar
+              </Link>
+            </>
           )}
         </nav>
         <div className="ml-auto flex items-center gap-3">
+          <SearchBar />
           {user ? (
             <UserMenu name={user.name} email={user.email} />
           ) : (
