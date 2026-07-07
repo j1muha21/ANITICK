@@ -4,13 +4,15 @@ import type { Metadata } from "next";
 import CountdownTimer from "@/components/CountdownTimer";
 import LocalTime from "@/components/LocalTime";
 import AddToListButton from "@/components/AddToListButton";
+import ScreensaverTimer from "@/components/timers/ScreensaverTimer";
 import { formatLabel, suggestedStatus } from "@/components/AnimeCard";
-import { getTrackedIds } from "@/lib/list";
-import { getUser } from "@/lib/session";
 import { AniListError, fetchAniList } from "@/lib/anilist/client";
 import { MEDIA_DETAIL_QUERY } from "@/lib/anilist/queries";
 import type { MediaDetail } from "@/lib/anilist/types";
 import { displayTitle, mainStudio } from "@/lib/anilist/types";
+import { getTrackedIds } from "@/lib/list";
+import { getPrefs } from "@/lib/prefs";
+import { getUser } from "@/lib/session";
 import { seasonLabel } from "@/lib/season";
 
 interface DetailData {
@@ -52,12 +54,28 @@ export default async function AnimeDetailPage({
 
   const [media, user] = await Promise.all([getMedia(mediaId), getUser()]);
   if (!media) notFound();
-  const tracked = user ? (await getTrackedIds(user.id)).includes(mediaId) : false;
+
+  const [tracked, prefs] = await Promise.all([
+    user ? getTrackedIds(user.id).then((ids) => ids.includes(mediaId)) : false,
+    user ? getPrefs(user.id) : null,
+  ]);
 
   const title = displayTitle(media);
   const cover = media.coverImage.extraLarge ?? media.coverImage.large;
+  const backdrop = media.bannerImage ?? cover;
   const next = media.nextAiringEpisode;
   const upcoming = media.airingSchedule.nodes;
+
+  const statusLine =
+    media.status === "FINISHED"
+      ? "Finished airing"
+      : media.status === "NOT_YET_RELEASED"
+        ? "Not yet released — no air date announced"
+        : media.status === "CANCELLED"
+          ? "Cancelled"
+          : media.status === "HIATUS"
+            ? "On hiatus"
+            : "No upcoming episode scheduled";
 
   const facts: [string, string | null][] = [
     ["Format", formatLabel(media.format)],
@@ -77,69 +95,94 @@ export default async function AnimeDetailPage({
 
   return (
     <article className="-mx-4 -mt-6">
-      {media.bannerImage && (
-        <div className="relative h-48 w-full sm:h-64">
-          <Image src={media.bannerImage} alt="" fill className="object-cover" priority />
-          <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
-        </div>
-      )}
-
-      <div className={`mx-auto max-w-5xl px-4 ${media.bannerImage ? "-mt-20 relative" : "pt-6"}`}>
-        <div className="flex flex-col gap-6 sm:flex-row">
-          <div className="w-40 shrink-0 sm:w-52">
-            {cover && (
-              <Image
-                src={cover}
-                alt={title}
-                width={208}
-                height={312}
-                className="rounded-xl shadow-lg"
-                priority
-              />
-            )}
-            {user && (
-              <div className="mt-3">
-                <AddToListButton
-                  mediaId={media.id}
-                  title={title}
-                  coverImage={media.coverImage.large}
-                  status={suggestedStatus(media)}
-                  tracked={tracked}
-                />
-              </div>
-            )}
+      {/* ------------------------------------------------------------------ */}
+      {/* Screensaver hero: poster on top, big ambient timer underneath       */}
+      {/* ------------------------------------------------------------------ */}
+      <section className="relative flex min-h-[88vh] flex-col items-center justify-center overflow-hidden px-4 py-14">
+        {backdrop && (
+          <div className="absolute inset-0 -z-10">
+            <Image
+              src={backdrop}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="scale-110 object-cover opacity-40 blur-2xl saturate-150"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background" />
           </div>
+        )}
 
-          <div className="min-w-0 flex-1 sm:pt-16">
-            <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
-            {media.title.romaji && media.title.english && (
-              <p className="mt-1 text-sm text-muted">{media.title.romaji}</p>
-            )}
+        {cover && (
+          <Image
+            src={cover}
+            alt={title}
+            width={224}
+            height={336}
+            priority
+            className="glow-accent-strong w-44 rounded-2xl border border-glass-border sm:w-56"
+          />
+        )}
 
-            {next && (
-              <div className="mt-5">
-                <p className="mb-2 text-sm font-semibold text-muted">
-                  Episode {next.episode} airs in
-                </p>
-                <CountdownTimer airingAt={next.airingAt} variant="full" />
-              </div>
-            )}
+        <h1 className="mt-6 max-w-3xl text-center text-2xl font-bold sm:text-4xl">{title}</h1>
+        {media.title.romaji && media.title.english && (
+          <p className="mt-1 text-center text-sm text-muted">{media.title.romaji}</p>
+        )}
 
-            <div className="mt-5 flex flex-wrap gap-2">
-              {media.genres.map((g) => (
-                <span key={g} className="glass rounded-full px-3 py-1 text-xs text-muted">
-                  {g}
-                </span>
-              ))}
-            </div>
-
-            {media.description && (
-              <p className="mt-5 whitespace-pre-line text-sm leading-relaxed text-foreground/85">
-                {stripHtml(media.description)}
+        <div className="mt-8 w-full max-w-2xl">
+          {next ? (
+            <>
+              <p className="mb-6 text-center text-sm font-semibold uppercase tracking-[0.25em] text-muted">
+                Episode {next.episode} airs in
               </p>
-            )}
-          </div>
+              <ScreensaverTimer
+                airingAt={next.airingAt}
+                defaultStyle={prefs?.timerStyle ?? "digital"}
+                persist={Boolean(user)}
+              />
+            </>
+          ) : (
+            <p className="text-center text-lg text-muted">{statusLine}</p>
+          )}
         </div>
+
+        {user && (
+          <div className="mt-8 w-52">
+            <AddToListButton
+              mediaId={media.id}
+              title={title}
+              coverImage={media.coverImage.large}
+              status={suggestedStatus(media)}
+              tracked={tracked}
+            />
+          </div>
+        )}
+
+        <a
+          href="#details"
+          className="absolute bottom-5 text-xs uppercase tracking-widest text-muted transition-colors hover:text-foreground"
+        >
+          ↓ details
+        </a>
+      </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Details below the fold                                              */}
+      {/* ------------------------------------------------------------------ */}
+      <div id="details" className="mx-auto max-w-5xl px-4 pb-10 pt-6">
+        <div className="flex flex-wrap justify-center gap-2">
+          {media.genres.map((g) => (
+            <span key={g} className="glass rounded-full px-3 py-1 text-xs text-muted">
+              {g}
+            </span>
+          ))}
+        </div>
+
+        {media.description && (
+          <p className="mx-auto mt-6 max-w-3xl whitespace-pre-line text-sm leading-relaxed text-foreground/85">
+            {stripHtml(media.description)}
+          </p>
+        )}
 
         <dl className="glass mt-8 grid grid-cols-2 gap-4 rounded-2xl p-5 sm:grid-cols-4">
           {facts
@@ -153,7 +196,7 @@ export default async function AnimeDetailPage({
         </dl>
 
         {upcoming.length > 0 && (
-          <section className="mt-8 pb-4">
+          <section className="mt-8">
             <h2 className="mb-3 text-lg font-bold">Upcoming Episodes</h2>
             <ul className="glass divide-y divide-glass-border overflow-hidden rounded-2xl">
               {upcoming.map((ep) => (

@@ -100,3 +100,21 @@ select option {
 ::selection {
   background: color-mix(in srgb, var(--accent) 40%, transparent);
 }
+
+/* Split-flap digit animation (FlipTimer) */
+@keyframes flip-in {
+  0% {
+    transform: rotateX(-90deg);
+    opacity: 0.4;
+  }
+  100% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+.flip-digit {
+  animation: flip-in 0.4s cubic-bezier(0.3, 1.4, 0.6, 1);
+  transform-origin: center 60%;
+  backface-visibility: hidden;
+}

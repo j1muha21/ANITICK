@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import AccountSection from "@/components/settings/AccountSection";
 import AnilistSection from "@/components/settings/AnilistSection";
+import AppearanceSection from "@/components/settings/AppearanceSection";
 import SettingsCard from "@/components/settings/SettingsCard";
 import { getConnection } from "@/lib/anilist/connection";
+import { getPrefs } from "@/lib/prefs";
 import { getUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +20,11 @@ export default async function SettingsPage({
   const user = await getUser();
   if (!user) redirect("/login");
 
-  const [connection, { anilist }] = await Promise.all([getConnection(user.id), searchParams]);
+  const [connection, prefs, { anilist }] = await Promise.all([
+    getConnection(user.id),
+    getPrefs(user.id),
+    searchParams,
+  ]);
   const flash = anilist === "connected" ? "connected" : anilist === "error" ? "error" : undefined;
 
   return (
@@ -45,9 +51,13 @@ export default async function SettingsPage({
 
         <SettingsCard
           title="Appearance & Theme"
-          subtitle="Accent color and countdown timer style (coming soon)"
+          subtitle="One neon accent, applied across buttons, glows and timers"
         >
-          <p className="text-sm text-muted">Defaults active: neon purple, digital timer.</p>
+          <AppearanceSection
+            accentColor={prefs.accentColor}
+            timerStyle={prefs.timerStyle}
+            defaultView={prefs.defaultView}
+          />
         </SettingsCard>
       </div>
     </div>
