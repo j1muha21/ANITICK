@@ -12,10 +12,13 @@ export class AniListError extends Error {
   }
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function gql<T>(
   query: string,
   variables: Record<string, unknown>,
   token?: string,
+  isRetry = false,
 ): Promise<T> {
   const res = await fetch(ANILIST_API, {
     method: "POST",
@@ -27,6 +30,15 @@ async function gql<T>(
     body: JSON.stringify({ query, variables }),
     cache: "no-store",
   });
+
+  // Rate limited: retry once after a short wait (bounded so SSR isn't held hostage).
+  if (res.status === 429 && !isRetry) {
+    const retryAfter = Number(res.headers.get("retry-after")) || 2;
+    if (retryAfter <= 5) {
+      await sleep(retryAfter * 1000);
+      return gql<T>(query, variables, token, true);
+    }
+  }
 
   const json = await res.json().catch(() => null);
 

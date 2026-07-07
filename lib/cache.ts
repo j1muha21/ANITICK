@@ -12,10 +12,15 @@ const globalStore = globalThis as unknown as {
 const store = (globalStore.__anitickCache ??= new Map<string, Entry>());
 const inflight = (globalStore.__anitickInflight ??= new Map<string, Promise<unknown>>());
 
+// After an upstream failure, serve the stale value and back off this long
+// before trying the producer again.
+const STALE_RETRY_MS = 60 * 1000;
+
 /**
  * Memoize an async producer under `key` for `ttlMs`. Concurrent callers for
  * the same key share one in-flight promise, so a burst of page renders costs
- * a single AniList request.
+ * a single AniList request. Expired entries are kept and served as stale
+ * fallbacks when the producer fails (e.g. AniList rate limiting).
  */
 export async function cached<T>(key: string, ttlMs: number, fn: () => Promise<T>): Promise<T> {
   const hit = store.get(key);
@@ -32,6 +37,14 @@ export async function cached<T>(key: string, ttlMs: number, fn: () => Promise<T>
     .then((value) => {
       store.set(key, { value, expires: Date.now() + ttlMs });
       return value;
+    })
+    .catch((err) => {
+      if (hit) {
+        // Stale beats a crashed page; also back off further retries briefly.
+        store.set(key, { value: hit.value, expires: Date.now() + STALE_RETRY_MS });
+        return hit.value as T;
+      }
+      throw err;
     })
     .finally(() => {
       inflight.delete(key);
