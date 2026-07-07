@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import AuthForm from "@/components/AuthForm";
 import { getUser } from "@/lib/session";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = { title: "Sign up" };
 
 export default async function SignupPage() {
