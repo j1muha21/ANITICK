@@ -7,7 +7,6 @@ import SeasonSelector from "@/components/SeasonSelector";
 import { fetchAniList } from "@/lib/anilist/client";
 import { SEASONAL_QUERY } from "@/lib/anilist/queries";
 import type { MediaCard, PageInfo } from "@/lib/anilist/types";
-import { getSession } from "@/lib/session";
 import type { ChartSort, SeasonRef } from "@/lib/season";
 import { CHART_SORTS, FORMATS, GENRES, currentSeason, parseSeasonSlug, seasonLabel } from "@/lib/season";
 
@@ -75,11 +74,9 @@ export default async function ChartPage({ params, searchParams }: PageProps) {
     query.sort && query.sort in CHART_SORTS ? (query.sort as ChartSort) : "POPULARITY_DESC";
   const view = query.view === "list" ? "list" : "grid";
 
-  const [media, session] = await Promise.all([
-    fetchSeason(ref, format, genre, sort),
-    getSession(),
-  ]);
-  const canAdd = Boolean(session);
+  const media = await fetchSeason(ref, format, genre, sort);
+  // Add-to-list buttons return with the DB-backed tracked list (Stage 3).
+  const canAdd = false;
 
   return (
     <div>

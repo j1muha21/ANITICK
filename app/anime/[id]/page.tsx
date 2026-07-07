@@ -3,13 +3,11 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import CountdownTimer from "@/components/CountdownTimer";
 import LocalTime from "@/components/LocalTime";
-import AddToPlanningButton from "@/components/AddToPlanningButton";
 import { formatLabel } from "@/components/AnimeCard";
 import { AniListError, fetchAniList } from "@/lib/anilist/client";
 import { MEDIA_DETAIL_QUERY } from "@/lib/anilist/queries";
 import type { MediaDetail } from "@/lib/anilist/types";
 import { displayTitle, mainStudio } from "@/lib/anilist/types";
-import { getSession } from "@/lib/session";
 import { seasonLabel } from "@/lib/season";
 
 interface DetailData {
@@ -49,7 +47,7 @@ export default async function AnimeDetailPage({
   const mediaId = Number(id);
   if (!Number.isInteger(mediaId) || mediaId <= 0) notFound();
 
-  const [media, session] = await Promise.all([getMedia(mediaId), getSession()]);
+  const media = await getMedia(mediaId);
   if (!media) notFound();
 
   const title = displayTitle(media);
@@ -95,11 +93,7 @@ export default async function AnimeDetailPage({
                 priority
               />
             )}
-            {session && (
-              <div className="mt-3">
-                <AddToPlanningButton mediaId={media.id} />
-              </div>
-            )}
+            {/* Add-to-list button returns with the DB-backed tracked list (Stage 3) */}
           </div>
 
           <div className="min-w-0 flex-1 sm:pt-16">

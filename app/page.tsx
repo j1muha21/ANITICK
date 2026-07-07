@@ -3,7 +3,6 @@ import AnimeCard from "@/components/AnimeCard";
 import { fetchAniList } from "@/lib/anilist/client";
 import { AIRING_TODAY_QUERY, SEASONAL_QUERY, TRENDING_QUERY } from "@/lib/anilist/queries";
 import type { AiringScheduleItem, MediaCard, PageInfo } from "@/lib/anilist/types";
-import { getSession } from "@/lib/session";
 import { currentSeason, nextSeason, seasonLabel, seasonSlug } from "@/lib/season";
 
 export const dynamic = "force-dynamic";
@@ -54,8 +53,7 @@ export default async function HomePage() {
   const now = Math.floor(Date.now() / 1000 / 900) * 900;
   const upcoming = nextSeason(currentSeason());
 
-  const [session, trending, airing, seasonal] = await Promise.all([
-    getSession(),
+  const [trending, airing, seasonal] = await Promise.all([
     fetchAniList<TrendingData>(TRENDING_QUERY, { perPage: 18 }),
     fetchAniList<AiringData>(AIRING_TODAY_QUERY, { from: now, to: now + 86400, perPage: 50 }),
     fetchAniList<SeasonalData>(SEASONAL_QUERY, {
@@ -74,7 +72,8 @@ export default async function HomePage() {
     return true;
   });
 
-  const canAdd = Boolean(session);
+  // Add-to-list buttons return with the DB-backed tracked list (Stage 3).
+  const canAdd = false;
 
   return (
     <>

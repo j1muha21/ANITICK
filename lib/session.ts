@@ -1,16 +1,29 @@
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import { EncryptJWT, jwtDecrypt } from "jose";
 import { createHash } from "crypto";
+import { auth } from "@/lib/auth";
 
-export const SESSION_COOKIE = "anitick_session";
-export const STATE_COOKIE = "anitick_oauth_state";
-
-export interface Session {
-  accessToken: string;
-  userId: number;
-  userName: string;
-  avatar: string | null;
+export interface AppUser {
+  id: string;
+  name: string;
+  email: string;
+  image?: string | null;
 }
+
+/** The logged-in app user (better-auth session), or null. Server-side only. */
+export async function getUser(): Promise<AppUser | null> {
+  if (!process.env.DATABASE_URL) return null;
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    return session?.user ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Token sealing — encrypts AniList access tokens before they touch the DB
+// ---------------------------------------------------------------------------
 
 function secretKey(): Uint8Array {
   const secret = process.env.SESSION_SECRET;
@@ -21,43 +34,18 @@ function secretKey(): Uint8Array {
   return createHash("sha256").update(secret).digest();
 }
 
-export async function sealSession(session: Session): Promise<string> {
-  return new EncryptJWT({ ...session })
+export async function sealToken(token: string): Promise<string> {
+  return new EncryptJWT({ t: token })
     .setProtectedHeader({ alg: "dir", enc: "A256GCM" })
     .setIssuedAt()
-    .setExpirationTime("330d") // AniList tokens live ~1 year; expire the cookie a bit sooner
     .encrypt(secretKey());
 }
 
-export async function openSession(sealed: string): Promise<Session | null> {
+export async function openToken(sealed: string): Promise<string | null> {
   try {
     const { payload } = await jwtDecrypt(sealed, secretKey());
-    if (typeof payload.accessToken !== "string" || typeof payload.userId !== "number") {
-      return null;
-    }
-    return {
-      accessToken: payload.accessToken,
-      userId: payload.userId,
-      userName: String(payload.userName ?? ""),
-      avatar: typeof payload.avatar === "string" ? payload.avatar : null,
-    };
+    return typeof payload.t === "string" ? payload.t : null;
   } catch {
     return null;
   }
 }
-
-/** Read the current session from the request cookies (server-side only). */
-export async function getSession(): Promise<Session | null> {
-  const jar = await cookies();
-  const sealed = jar.get(SESSION_COOKIE)?.value;
-  if (!sealed) return null;
-  return openSession(sealed);
-}
-
-export const sessionCookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax",
-  path: "/",
-  maxAge: 330 * 24 * 60 * 60,
-} as const;

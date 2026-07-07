@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
-import { getSession } from "@/lib/session";
+import { getUser } from "@/lib/session";
+import UserMenu from "@/components/UserMenu";
 
 export default async function Header() {
-  const session = await getSession();
+  const user = await getUser();
 
   return (
     <header className="glass sticky top-0 z-20 border-x-0 border-t-0">
@@ -18,41 +18,30 @@ export default async function Header() {
           <Link href="/chart" className="transition-colors hover:text-foreground">
             Seasonal Chart
           </Link>
-          {session && (
+          {user && (
             <Link href="/dashboard" className="transition-colors hover:text-foreground">
               My Countdowns
             </Link>
           )}
         </nav>
         <div className="ml-auto flex items-center gap-3">
-          {session ? (
+          {user ? (
+            <UserMenu name={user.name} email={user.email} />
+          ) : (
             <>
-              <span className="hidden items-center gap-2 text-sm sm:flex">
-                {session.avatar && (
-                  <Image
-                    src={session.avatar}
-                    alt={session.userName}
-                    width={28}
-                    height={28}
-                    className="rounded-full"
-                  />
-                )}
-                {session.userName}
-              </span>
-              <a
-                href="/api/auth/logout"
+              <Link
+                href="/login"
                 className="glass rounded-lg px-3 py-1.5 text-sm text-muted transition-colors hover:text-foreground"
               >
-                Log out
-              </a>
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                className="glow-accent rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-accent-strong"
+              >
+                Sign up
+              </Link>
             </>
-          ) : (
-            <a
-              href="/api/auth/login"
-              className="glow-accent rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-accent-strong"
-            >
-              Connect AniList
-            </a>
           )}
         </div>
       </div>
