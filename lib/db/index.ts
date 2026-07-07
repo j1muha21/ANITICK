@@ -20,8 +20,15 @@ function createClient() {
       prepare: false,
     });
   }
-  // prepare: false is required for Supabase's transaction-mode pooler.
-  return postgres(url, { prepare: false });
+  // Serverless-friendly settings: one connection per instance (Vercel spins up
+  // many instances — driver default of 10 each exhausts Supabase's pooler),
+  // released when idle. prepare: false is required by the transaction pooler.
+  return postgres(url, {
+    prepare: false,
+    max: 1,
+    idle_timeout: 20,
+    connect_timeout: 10,
+  });
 }
 
 const currentUrl = process.env.DATABASE_URL ?? "";

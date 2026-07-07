@@ -18,7 +18,10 @@ export async function getUser(): Promise<AppUser | null> {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
     return session?.user ?? null;
-  } catch {
+  } catch (err) {
+    // Degrade to logged-out rather than crash, but keep the cause visible —
+    // a silent null here once masked pooler exhaustion as "random logouts".
+    console.error("getUser: session lookup failed:", err);
     return null;
   }
 }
