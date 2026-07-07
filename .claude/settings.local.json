@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(curl -s -b /tmp/at_cookies.txt -X POST http://localhost:3000/api/auth/change-password -H \"Content-Type: application/json\" -H \"Origin: http://localhost:3000\" -d '{\"currentPassword\":\"testpass123\",\"newPassword\":\"testpass456\",\"revokeOtherSessions\":false}' -w \"\\\\nHTTP %{http_code}\\\\n\")"
-    ]
-  }
-}
