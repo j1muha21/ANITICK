@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { fetchAniListAuthed } from "@/lib/anilist/client";
+import { getConnection } from "@/lib/anilist/connection";
+import { SAVE_LIST_ENTRY_MUTATION } from "@/lib/anilist/queries";
 import { addTracked, removeTracked, updateTracked } from "@/lib/list";
 import { getUser } from "@/lib/session";
 
@@ -28,6 +31,20 @@ export async function POST(req: NextRequest) {
     coverImage: typeof body.coverImage === "string" ? body.coverImage : null,
     status: isStatus(body.status) ? body.status : undefined,
   });
+
+  // Best-effort mirror to AniList when an account is connected — the app's
+  // own list is the source of truth, so a failure here never blocks the add.
+  try {
+    const connection = await getConnection(user.id);
+    if (connection) {
+      await fetchAniListAuthed(connection.accessToken, SAVE_LIST_ENTRY_MUTATION, {
+        mediaId: body.mediaId,
+        status: body.status === "watching" ? "CURRENT" : "PLANNING",
+      });
+    }
+  } catch (err) {
+    console.warn(`AniList mirror failed for media ${body.mediaId}:`, err);
+  }
 
   return NextResponse.json({ ok: true });
 }

@@ -3,6 +3,8 @@ import { EncryptJWT, jwtDecrypt } from "jose";
 import { createHash } from "crypto";
 import { auth } from "@/lib/auth";
 
+export const STATE_COOKIE = "anitick_oauth_state";
+
 export interface AppUser {
   id: string;
   name: string;

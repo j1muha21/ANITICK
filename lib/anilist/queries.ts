@@ -135,27 +135,32 @@ export const VIEWER_QUERY = /* GraphQL */ `
   }
 `;
 
-export const MEDIA_LIST_QUERY = /* GraphQL */ `
-  query MediaList($userId: Int!) {
-    MediaListCollection(userId: $userId, type: ANIME, status_in: [CURRENT, PLANNING]) {
+export const SYNC_LIST_QUERY = /* GraphQL */ `
+  query SyncList($userId: Int!) {
+    MediaListCollection(userId: $userId, type: ANIME) {
       lists {
-        name
         status
         entries {
-          progress
+          status
           media {
-            ...MediaCardFields
+            id
+            title {
+              romaji
+              english
+            }
+            coverImage {
+              large
+            }
           }
         }
       }
     }
   }
-  ${MEDIA_CARD_FIELDS}
 `;
 
-export const ADD_TO_PLANNING_MUTATION = /* GraphQL */ `
-  mutation AddToPlanning($mediaId: Int!) {
-    SaveMediaListEntry(mediaId: $mediaId, status: PLANNING) {
+export const SAVE_LIST_ENTRY_MUTATION = /* GraphQL */ `
+  mutation SaveListEntry($mediaId: Int!, $status: MediaListStatus!) {
+    SaveMediaListEntry(mediaId: $mediaId, status: $status) {
       id
       status
     }
