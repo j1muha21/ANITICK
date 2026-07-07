@@ -3,12 +3,17 @@ import Link from "next/link";
 import type { MediaCard } from "@/lib/anilist/types";
 import { displayTitle, mainStudio } from "@/lib/anilist/types";
 import CountdownTimer from "@/components/CountdownTimer";
-import AddToPlanningButton from "@/components/AddToPlanningButton";
+import AddToListButton from "@/components/AddToListButton";
+import TrackedControls from "@/components/TrackedControls";
 
 interface Props {
   media: MediaCard;
-  /** Show the "Add to Planning" button (only when the viewer is logged in). */
+  /** Show the add/remove list button (only when the viewer is logged in). */
   canAddToList?: boolean;
+  /** Whether this anime is already on the viewer's list. */
+  tracked?: boolean;
+  /** Dashboard mode: show pin/remove controls instead of the add button. */
+  controls?: { pinned: boolean };
 }
 
 const FORMAT_LABELS: Record<string, string> = {
@@ -26,7 +31,11 @@ export function formatLabel(format: string | null): string {
   return FORMAT_LABELS[format] ?? format.replaceAll("_", " ");
 }
 
-export default function AnimeCard({ media, canAddToList = false }: Props) {
+export function suggestedStatus(media: Pick<MediaCard, "status">): "watching" | "planning" {
+  return media.status === "RELEASING" ? "watching" : "planning";
+}
+
+export default function AnimeCard({ media, canAddToList = false, tracked = false, controls }: Props) {
   const title = displayTitle(media);
   const studio = mainStudio(media);
   const cover = media.coverImage.extraLarge ?? media.coverImage.large;
@@ -63,11 +72,21 @@ export default function AnimeCard({ media, canAddToList = false }: Props) {
           </p>
         </div>
       </Link>
-      {canAddToList && (
+      {controls ? (
         <div className="px-3 pb-3">
-          <AddToPlanningButton mediaId={media.id} />
+          <TrackedControls mediaId={media.id} pinned={controls.pinned} />
         </div>
-      )}
+      ) : canAddToList ? (
+        <div className="px-3 pb-3">
+          <AddToListButton
+            mediaId={media.id}
+            title={title}
+            coverImage={media.coverImage.large}
+            status={suggestedStatus(media)}
+            tracked={tracked}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

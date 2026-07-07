@@ -3,6 +3,8 @@ import AnimeCard from "@/components/AnimeCard";
 import { fetchAniList } from "@/lib/anilist/client";
 import { AIRING_TODAY_QUERY, SEASONAL_QUERY, TRENDING_QUERY } from "@/lib/anilist/queries";
 import type { AiringScheduleItem, MediaCard, PageInfo } from "@/lib/anilist/types";
+import { getTrackedIds } from "@/lib/list";
+import { getUser } from "@/lib/session";
 import { currentSeason, nextSeason, seasonLabel, seasonSlug } from "@/lib/season";
 
 export const dynamic = "force-dynamic";
@@ -53,7 +55,8 @@ export default async function HomePage() {
   const now = Math.floor(Date.now() / 1000 / 900) * 900;
   const upcoming = nextSeason(currentSeason());
 
-  const [trending, airing, seasonal] = await Promise.all([
+  const [user, trending, airing, seasonal] = await Promise.all([
+    getUser(),
     fetchAniList<TrendingData>(TRENDING_QUERY, { perPage: 18 }),
     fetchAniList<AiringData>(AIRING_TODAY_QUERY, { from: now, to: now + 86400, perPage: 50 }),
     fetchAniList<SeasonalData>(SEASONAL_QUERY, {
@@ -72,20 +75,20 @@ export default async function HomePage() {
     return true;
   });
 
-  // Add-to-list buttons return with the DB-backed tracked list (Stage 3).
-  const canAdd = false;
+  const canAdd = Boolean(user);
+  const trackedIds = new Set(user ? await getTrackedIds(user.id) : []);
 
   return (
     <>
       <Section title="Airing Today" subtitle="Episodes releasing in the next 24 hours">
         {airingToday.slice(0, 12).map(({ media }) => (
-          <AnimeCard key={media.id} media={media} canAddToList={canAdd} />
+          <AnimeCard key={media.id} media={media} canAddToList={canAdd} tracked={trackedIds.has(media.id)} />
         ))}
       </Section>
 
       <Section title="Trending Now" subtitle="Most talked-about airing anime">
         {trending.Page.media.map((media) => (
-          <AnimeCard key={media.id} media={media} canAddToList={canAdd} />
+          <AnimeCard key={media.id} media={media} canAddToList={canAdd} tracked={trackedIds.has(media.id)} />
         ))}
       </Section>
 
@@ -95,7 +98,7 @@ export default async function HomePage() {
         href={{ label: "Full chart", url: `/chart/${seasonSlug(upcoming)}` }}
       >
         {seasonal.Page.media.slice(0, 12).map((media) => (
-          <AnimeCard key={media.id} media={media} canAddToList={canAdd} />
+          <AnimeCard key={media.id} media={media} canAddToList={canAdd} tracked={trackedIds.has(media.id)} />
         ))}
       </Section>
     </>

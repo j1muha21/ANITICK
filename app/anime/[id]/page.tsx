@@ -3,7 +3,10 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import CountdownTimer from "@/components/CountdownTimer";
 import LocalTime from "@/components/LocalTime";
-import { formatLabel } from "@/components/AnimeCard";
+import AddToListButton from "@/components/AddToListButton";
+import { formatLabel, suggestedStatus } from "@/components/AnimeCard";
+import { getTrackedIds } from "@/lib/list";
+import { getUser } from "@/lib/session";
 import { AniListError, fetchAniList } from "@/lib/anilist/client";
 import { MEDIA_DETAIL_QUERY } from "@/lib/anilist/queries";
 import type { MediaDetail } from "@/lib/anilist/types";
@@ -47,8 +50,9 @@ export default async function AnimeDetailPage({
   const mediaId = Number(id);
   if (!Number.isInteger(mediaId) || mediaId <= 0) notFound();
 
-  const media = await getMedia(mediaId);
+  const [media, user] = await Promise.all([getMedia(mediaId), getUser()]);
   if (!media) notFound();
+  const tracked = user ? (await getTrackedIds(user.id)).includes(mediaId) : false;
 
   const title = displayTitle(media);
   const cover = media.coverImage.extraLarge ?? media.coverImage.large;
@@ -93,7 +97,17 @@ export default async function AnimeDetailPage({
                 priority
               />
             )}
-            {/* Add-to-list button returns with the DB-backed tracked list (Stage 3) */}
+            {user && (
+              <div className="mt-3">
+                <AddToListButton
+                  mediaId={media.id}
+                  title={title}
+                  coverImage={media.coverImage.large}
+                  status={suggestedStatus(media)}
+                  tracked={tracked}
+                />
+              </div>
+            )}
           </div>
 
           <div className="min-w-0 flex-1 sm:pt-16">

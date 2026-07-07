@@ -2,16 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import type { MediaCard } from "@/lib/anilist/types";
 import { displayTitle, mainStudio } from "@/lib/anilist/types";
-import { formatLabel } from "@/components/AnimeCard";
+import { formatLabel, suggestedStatus } from "@/components/AnimeCard";
 import CountdownTimer from "@/components/CountdownTimer";
-import AddToPlanningButton from "@/components/AddToPlanningButton";
+import AddToListButton from "@/components/AddToListButton";
 
 interface Props {
   media: MediaCard;
   canAddToList?: boolean;
+  tracked?: boolean;
 }
 
-export default function AnimeListRow({ media, canAddToList = false }: Props) {
+export default function AnimeListRow({ media, canAddToList = false, tracked = false }: Props) {
   const title = displayTitle(media);
   const studio = mainStudio(media);
   const next = media.nextAiringEpisode;
@@ -57,7 +58,13 @@ export default function AnimeListRow({ media, canAddToList = false }: Props) {
         )}
         {canAddToList && (
           <div className="w-36">
-            <AddToPlanningButton mediaId={media.id} />
+            <AddToListButton
+              mediaId={media.id}
+              title={title}
+              coverImage={media.coverImage.large}
+              status={suggestedStatus(media)}
+              tracked={tracked}
+            />
           </div>
         )}
       </div>

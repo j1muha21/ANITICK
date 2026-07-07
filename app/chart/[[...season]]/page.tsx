@@ -7,6 +7,8 @@ import SeasonSelector from "@/components/SeasonSelector";
 import { fetchAniList } from "@/lib/anilist/client";
 import { SEASONAL_QUERY } from "@/lib/anilist/queries";
 import type { MediaCard, PageInfo } from "@/lib/anilist/types";
+import { getTrackedIds } from "@/lib/list";
+import { getUser } from "@/lib/session";
 import type { ChartSort, SeasonRef } from "@/lib/season";
 import { CHART_SORTS, FORMATS, GENRES, currentSeason, parseSeasonSlug, seasonLabel } from "@/lib/season";
 
@@ -74,9 +76,9 @@ export default async function ChartPage({ params, searchParams }: PageProps) {
     query.sort && query.sort in CHART_SORTS ? (query.sort as ChartSort) : "POPULARITY_DESC";
   const view = query.view === "list" ? "list" : "grid";
 
-  const media = await fetchSeason(ref, format, genre, sort);
-  // Add-to-list buttons return with the DB-backed tracked list (Stage 3).
-  const canAdd = false;
+  const [media, user] = await Promise.all([fetchSeason(ref, format, genre, sort), getUser()]);
+  const canAdd = Boolean(user);
+  const trackedIds = new Set(user ? await getTrackedIds(user.id) : []);
 
   return (
     <div>
@@ -101,13 +103,13 @@ export default async function ChartPage({ params, searchParams }: PageProps) {
       ) : view === "list" ? (
         <div className="flex flex-col gap-2">
           {media.map((m) => (
-            <AnimeListRow key={m.id} media={m} canAddToList={canAdd} />
+            <AnimeListRow key={m.id} media={m} canAddToList={canAdd} tracked={trackedIds.has(m.id)} />
           ))}
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {media.map((m) => (
-            <AnimeCard key={m.id} media={m} canAddToList={canAdd} />
+            <AnimeCard key={m.id} media={m} canAddToList={canAdd} tracked={trackedIds.has(m.id)} />
           ))}
         </div>
       )}
