@@ -1,0 +1,16 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+/** Re-fetches server data on an interval to catch airing-schedule changes. */
+export default function AutoRefresh({ intervalMs = 60 * 60 * 1000 }: { intervalMs?: number }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    const id = setInterval(() => router.refresh(), intervalMs);
+    return () => clearInterval(id);
+  }, [router, intervalMs]);
+
+  return null;
+}
