@@ -28,7 +28,7 @@ function Section({ title, subtitle, media }: { title: string; subtitle: string; 
         <p className="text-sm text-muted">{subtitle}</p>
       </div>
       {media.length === 0 ? (
-        <p className="rounded-xl bg-surface p-6 text-sm text-muted">Nothing here yet.</p>
+        <p className="glass rounded-2xl p-6 text-sm text-muted">Nothing here yet.</p>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {media.map((m) => (

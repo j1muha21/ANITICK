@@ -33,7 +33,7 @@ export default function AnimeCard({ media, canAddToList = false }: Props) {
   const next = media.nextAiringEpisode;
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-xl bg-surface transition-transform hover:-translate-y-1">
+    <div className="glass group relative flex flex-col overflow-hidden rounded-2xl transition-all duration-200 hover:-translate-y-1 hover:glow-accent">
       <Link href={`/anime/${media.id}`} className="flex flex-1 flex-col">
         <div className="relative aspect-2/3 w-full bg-surface-raised">
           {cover && (
@@ -46,7 +46,7 @@ export default function AnimeCard({ media, canAddToList = false }: Props) {
             />
           )}
           {next && (
-            <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/75 px-2.5 py-1.5 backdrop-blur-sm">
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-glass-border bg-black/60 px-2.5 py-1.5 backdrop-blur-md">
               <span className="text-xs text-muted">Ep {next.episode}</span>
               <CountdownTimer airingAt={next.airingAt} />
             </div>

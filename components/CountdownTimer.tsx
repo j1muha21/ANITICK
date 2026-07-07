@@ -65,7 +65,7 @@ export default function CountdownTimer({ airingAt, variant = "compact", classNam
         {segments.map(({ value, label }) => (
           <div
             key={label}
-            className="flex min-w-16 flex-col items-center rounded-lg bg-surface-raised px-3 py-2"
+            className="glass-raised glow-accent flex min-w-16 flex-col items-center rounded-xl px-3 py-2"
           >
             <span className="font-mono text-2xl font-bold text-accent-strong">{pad(value)}</span>
             <span className="text-xs uppercase tracking-wide text-muted">{label}</span>

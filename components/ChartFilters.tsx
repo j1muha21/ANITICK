@@ -20,7 +20,7 @@ export default function ChartFilters() {
 
   const view = searchParams.get("view") === "list" ? "list" : "grid";
 
-  const selectClass = "rounded-lg bg-surface px-3 py-2 text-sm";
+  const selectClass = "px-3 py-2 text-sm";
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -65,13 +65,15 @@ export default function ChartFilters() {
         ))}
       </select>
 
-      <div className="ml-auto flex overflow-hidden rounded-lg bg-surface text-sm">
+      <div className="glass ml-auto flex overflow-hidden rounded-lg text-sm">
         {(["grid", "list"] as const).map((v) => (
           <button
             key={v}
             onClick={() => setParam("view", v === "grid" ? "" : v)}
-            className={`px-3 py-2 capitalize transition-colors ${
-              view === v ? "bg-accent font-semibold text-background" : "hover:bg-surface-raised"
+            className={`px-3 py-2 capitalize transition-all ${
+              view === v
+                ? "glow-accent bg-accent font-semibold text-white"
+                : "hover:bg-surface-raised"
             }`}
           >
             {v}

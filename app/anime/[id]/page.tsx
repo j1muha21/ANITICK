@@ -119,7 +119,7 @@ export default async function AnimeDetailPage({
 
             <div className="mt-5 flex flex-wrap gap-2">
               {media.genres.map((g) => (
-                <span key={g} className="rounded-full bg-surface px-3 py-1 text-xs text-muted">
+                <span key={g} className="glass rounded-full px-3 py-1 text-xs text-muted">
                   {g}
                 </span>
               ))}
@@ -133,7 +133,7 @@ export default async function AnimeDetailPage({
           </div>
         </div>
 
-        <dl className="mt-8 grid grid-cols-2 gap-4 rounded-xl bg-surface p-5 sm:grid-cols-4">
+        <dl className="glass mt-8 grid grid-cols-2 gap-4 rounded-2xl p-5 sm:grid-cols-4">
           {facts
             .filter(([, v]) => v)
             .map(([k, v]) => (
@@ -147,7 +147,7 @@ export default async function AnimeDetailPage({
         {upcoming.length > 0 && (
           <section className="mt-8 pb-4">
             <h2 className="mb-3 text-lg font-bold">Upcoming Episodes</h2>
-            <ul className="divide-y divide-surface-raised overflow-hidden rounded-xl bg-surface">
+            <ul className="glass divide-y divide-glass-border overflow-hidden rounded-2xl">
               {upcoming.map((ep) => (
                 <li key={ep.episode} className="flex items-center justify-between px-4 py-3">
                   <span className="text-sm font-medium">Episode {ep.episode}</span>

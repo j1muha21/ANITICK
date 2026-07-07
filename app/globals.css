@@ -1,13 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0b1622;
-  --surface: #151f2e;
-  --surface-raised: #1d2a3d;
-  --foreground: #e5e9f0;
-  --muted: #8ba0b2;
-  --accent: #3db4f2;
-  --accent-strong: #64c6f7;
+  /* Single neon accent — user-customizable (Settings writes this via cookie/prefs) */
+  --accent: #a64bff;
+  --accent-strong: color-mix(in srgb, var(--accent) 65%, white);
+  --accent-soft: color-mix(in srgb, var(--accent) 22%, transparent);
+
+  --background: #070b14;
+  --foreground: #e8ecf5;
+  --muted: #8b97ad;
+
+  /* Glass-morphism tokens */
+  --surface: rgba(255, 255, 255, 0.045);
+  --surface-raised: rgba(255, 255, 255, 0.09);
+  --glass-border: rgba(255, 255, 255, 0.1);
 }
 
 @theme inline {
@@ -18,12 +24,79 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-glass-border: var(--glass-border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background-color: var(--background);
+  /* Moody neon backdrop: deep navy with soft accent + cyan blooms */
+  background-image:
+    radial-gradient(1100px 550px at 85% -10%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 65%),
+    radial-gradient(900px 500px at -10% 25%, rgba(56, 189, 248, 0.08), transparent 60%),
+    radial-gradient(800px 600px at 55% 115%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%);
+  background-attachment: fixed;
+}
+
+/* Glass panel primitives (as @utility so hover:/focus: variants work) */
+@utility glass {
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+@utility glass-raised {
+  background: var(--surface-raised);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* Neon glow helpers driven by the accent */
+@utility glow-accent {
+  box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+@utility glow-accent-strong {
+  box-shadow:
+    0 0 10px color-mix(in srgb, var(--accent) 55%, transparent),
+    0 0 34px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+@utility text-glow {
+  text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 65%, transparent);
+}
+
+/* Dark glass styling for native form controls */
+select,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"] {
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  color: var(--foreground);
+  border-radius: 0.6rem;
+  outline: none;
+}
+
+select:focus-visible,
+input:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+select option {
+  background: #0d1424;
+  color: var(--foreground);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
 }

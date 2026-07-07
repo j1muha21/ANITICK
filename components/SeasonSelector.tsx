@@ -22,7 +22,7 @@ export default function SeasonSelector({ current }: { current: SeasonRef }) {
       <Link
         href={withQuery(seasonSlug(prevSeason(current)))}
         aria-label="Previous season"
-        className="rounded-lg bg-surface px-3 py-2 text-sm hover:bg-surface-raised"
+        className="glass rounded-lg px-3 py-2 text-sm transition-shadow hover:glow-accent"
       >
         ←
       </Link>
@@ -31,7 +31,7 @@ export default function SeasonSelector({ current }: { current: SeasonRef }) {
         aria-label="Season"
         value={current.season}
         onChange={(e) => go({ ...current, season: e.target.value as SeasonRef["season"] })}
-        className="rounded-lg bg-surface px-3 py-2 text-sm font-semibold"
+        className="px-3 py-2 text-sm font-semibold"
       >
         {SEASONS.map((s) => (
           <option key={s} value={s}>
@@ -44,7 +44,7 @@ export default function SeasonSelector({ current }: { current: SeasonRef }) {
         aria-label="Year"
         value={current.year}
         onChange={(e) => go({ ...current, year: Number(e.target.value) })}
-        className="rounded-lg bg-surface px-3 py-2 text-sm font-semibold"
+        className="px-3 py-2 text-sm font-semibold"
       >
         {years.map((y) => (
           <option key={y} value={y}>
@@ -56,7 +56,7 @@ export default function SeasonSelector({ current }: { current: SeasonRef }) {
       <Link
         href={withQuery(seasonSlug(nextSeason(current)))}
         aria-label="Next season"
-        className="rounded-lg bg-surface px-3 py-2 text-sm hover:bg-surface-raised"
+        className="glass rounded-lg px-3 py-2 text-sm transition-shadow hover:glow-accent"
       >
         →
       </Link>

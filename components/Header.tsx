@@ -6,9 +6,9 @@ export default async function Header() {
   const session = await getSession();
 
   return (
-    <header className="sticky top-0 z-20 border-b border-surface-raised bg-background/90 backdrop-blur">
+    <header className="glass sticky top-0 z-20 border-x-0 border-t-0">
       <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-3">
-        <Link href="/" className="text-xl font-black tracking-tight text-accent">
+        <Link href="/" className="text-glow text-xl font-black tracking-tight text-accent">
           Ani<span className="text-foreground">Tick</span>
         </Link>
         <nav className="flex items-center gap-4 text-sm font-medium text-muted">
@@ -41,7 +41,7 @@ export default async function Header() {
               </span>
               <a
                 href="/api/auth/logout"
-                className="rounded-lg bg-surface px-3 py-1.5 text-sm text-muted transition-colors hover:text-foreground"
+                className="glass rounded-lg px-3 py-1.5 text-sm text-muted transition-colors hover:text-foreground"
               >
                 Log out
               </a>
@@ -49,7 +49,7 @@ export default async function Header() {
           ) : (
             <a
               href="/api/auth/login"
-              className="rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-background transition-colors hover:bg-accent-strong"
+              className="glow-accent rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-accent-strong"
             >
               Connect AniList
             </a>

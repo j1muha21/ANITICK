@@ -17,7 +17,7 @@ export default function AnimeListRow({ media, canAddToList = false }: Props) {
   const next = media.nextAiringEpisode;
 
   return (
-    <div className="flex items-center gap-4 rounded-xl bg-surface p-3">
+    <div className="glass flex items-center gap-4 rounded-2xl p-3 transition-shadow hover:glow-accent">
       <Link href={`/anime/${media.id}`} className="shrink-0">
         {media.coverImage.large && (
           <Image

@@ -35,7 +35,7 @@ export default function AddToPlanningButton({ mediaId }: { mediaId: number }) {
     <button
       onClick={add}
       disabled={state === "saving" || state === "added"}
-      className="w-full rounded-lg bg-surface-raised px-2 py-1.5 text-xs font-medium text-accent-strong transition-colors hover:bg-accent hover:text-background disabled:cursor-default disabled:opacity-70"
+      className="glass-raised w-full rounded-lg px-2 py-1.5 text-xs font-medium text-accent-strong transition-all hover:bg-accent hover:text-white hover:glow-accent disabled:cursor-default disabled:opacity-70"
     >
       {label}
     </button>
