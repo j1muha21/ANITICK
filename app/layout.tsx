@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 import "./globals.css";
 import Header from "@/components/Header";
 import AutoRefresh from "@/components/AutoRefresh";
+import NotificationsProvider from "@/components/NotificationsProvider";
+import RegisterSW from "@/components/RegisterSW";
 
 const ACCENT_COOKIE = "anitick_accent";
 const ACCENT_RE = /^#[0-9a-fA-F]{6}$/;
@@ -53,6 +55,8 @@ export default async function RootLayout({
           · Not affiliated with AniList
         </footer>
         <AutoRefresh />
+        <NotificationsProvider />
+        <RegisterSW />
       </body>
     </html>
   );

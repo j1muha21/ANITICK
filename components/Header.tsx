@@ -27,6 +27,9 @@ export default async function Header() {
               <Link href="/calendar" className="transition-colors hover:text-foreground">
                 Calendar
               </Link>
+              <Link href="/stats" className="transition-colors hover:text-foreground">
+                Stats
+              </Link>
             </>
           )}
         </nav>

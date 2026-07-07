@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import AccountSection from "@/components/settings/AccountSection";
 import AnilistSection from "@/components/settings/AnilistSection";
 import AppearanceSection from "@/components/settings/AppearanceSection";
+import IcsSection from "@/components/settings/IcsSection";
+import NotificationsSection from "@/components/settings/NotificationsSection";
 import SettingsCard from "@/components/settings/SettingsCard";
 import { getConnection } from "@/lib/anilist/connection";
 import { getPrefs } from "@/lib/prefs";
@@ -58,6 +60,17 @@ export default async function SettingsPage({
             timerStyle={prefs.timerStyle}
             defaultView={prefs.defaultView}
           />
+        </SettingsCard>
+
+        <SettingsCard
+          title="Notifications"
+          subtitle="Browser heads-up before tracked episodes air"
+        >
+          <NotificationsSection enabled={prefs.notifyEnabled} leadMin={prefs.notifyLeadMin} />
+        </SettingsCard>
+
+        <SettingsCard title="Calendar Export" subtitle="Subscribe from Google or Apple Calendar">
+          <IcsSection token={prefs.icsToken} />
         </SettingsCard>
       </div>
     </div>

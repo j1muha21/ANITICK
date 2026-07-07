@@ -169,6 +169,29 @@ export const SYNC_LIST_QUERY = /* GraphQL */ `
   }
 `;
 
+export const USER_STATS_QUERY = /* GraphQL */ `
+  query UserStats($userId: Int!) {
+    User(id: $userId) {
+      statistics {
+        anime {
+          count
+          episodesWatched
+          minutesWatched
+          meanScore
+          statuses {
+            status
+            count
+          }
+          genres(limit: 12, sort: COUNT_DESC) {
+            genre
+            count
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const SAVE_LIST_ENTRY_MUTATION = /* GraphQL */ `
   mutation SaveListEntry($mediaId: Int!, $status: MediaListStatus!) {
     SaveMediaListEntry(mediaId: $mediaId, status: $status) {
