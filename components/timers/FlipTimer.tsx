@@ -8,7 +8,7 @@ function FlipDigit({ char }: { char: string }) {
       // Keying by the character remounts the element on change, replaying the
       // flip animation like a split-flap panel.
       key={char}
-      className="flip-digit relative inline-flex h-14 w-9 items-center justify-center rounded-lg bg-[#12121a] font-mono text-3xl font-bold text-accent-strong shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)] sm:h-20 sm:w-14 sm:text-5xl"
+      className="flip-digit relative inline-flex h-11 w-7 items-center justify-center rounded-lg bg-[#12121a] font-mono text-2xl font-bold text-accent-strong shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)] sm:h-16 sm:w-11 sm:text-4xl md:h-20 md:w-14 md:text-5xl"
     >
       {char}
       {/* split-flap divider line */}
@@ -52,11 +52,13 @@ export default function FlipTimer({ airingAt }: { airingAt: number }) {
   ];
 
   return (
-    <div className="flex items-start justify-center gap-2 sm:gap-4">
+    <div className="flex items-start justify-center gap-1.5 sm:gap-3 md:gap-4">
       {groups.map((g, i) => (
-        <div key={g.label} className="flex items-start gap-2 sm:gap-4">
+        <div key={g.label} className="flex items-start gap-1.5 sm:gap-3 md:gap-4">
           {i > 0 && (
-            <span className="pt-3 font-mono text-2xl font-bold text-muted sm:pt-5 sm:text-4xl">:</span>
+            <span className="pt-2 font-mono text-xl font-bold text-muted sm:pt-4 sm:text-3xl md:text-4xl">
+              :
+            </span>
           )}
           <FlipGroup value={g.value} label={g.label} />
         </div>

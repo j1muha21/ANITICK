@@ -47,7 +47,7 @@ export default async function RootLayout({
       <body className="flex min-h-full flex-col">
         <Header />
         <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">{children}</main>
-        <footer className="border-t border-glass-border py-6 text-center text-xs text-muted">
+        <footer className="border-t border-glass-border pt-6 text-center text-xs text-muted pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
           AniTick · Data from{" "}
           <a href="https://anilist.co" className="text-accent hover:underline">
             AniList

@@ -22,14 +22,14 @@ export default function GlassCardTimer({ airingAt }: { airingAt: number }) {
   ];
 
   return (
-    <div className="glass glow-accent mx-auto rounded-3xl p-6 sm:p-8">
-      <div className="flex justify-center gap-3 sm:gap-5">
+    <div className="glass glow-accent mx-auto rounded-3xl p-4 sm:p-8">
+      <div className="flex justify-center gap-2 sm:gap-5">
         {segments.map(({ value, label }) => (
           <div
             key={label}
-            className="glass-raised flex min-w-16 flex-col items-center rounded-2xl px-3 py-4 shadow-lg sm:min-w-20 sm:px-5"
+            className="glass-raised flex min-w-14 flex-col items-center rounded-2xl px-2 py-3 shadow-lg sm:min-w-20 sm:px-5 sm:py-4"
           >
-            <span className="font-mono text-3xl font-bold tabular-nums text-accent-strong sm:text-5xl">
+            <span className="font-mono text-2xl font-bold tabular-nums text-accent-strong sm:text-5xl">
               {secondsLeft === null ? "--" : pad(value)}
             </span>
             <span className="mt-2 text-[10px] uppercase tracking-widest text-muted sm:text-xs">

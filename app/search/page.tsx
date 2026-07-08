@@ -34,6 +34,22 @@ export default async function SearchPage({
   return (
     <div>
       <h1 className="mb-1 text-2xl font-bold">Search</h1>
+      <form action="/search" className="my-4 flex max-w-xl gap-2" role="search">
+        <input
+          type="search"
+          name="q"
+          defaultValue={query}
+          placeholder="Search any anime…"
+          aria-label="Search anime"
+          className="min-w-0 flex-1 px-4 py-2.5 text-sm"
+        />
+        <button
+          type="submit"
+          className="glow-accent rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-strong"
+        >
+          Search
+        </button>
+      </form>
       <p className="mb-6 text-sm text-muted">
         {query ? (
           <>

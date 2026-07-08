@@ -57,7 +57,7 @@ export default function AnimeListRow({ media, canAddToList = false, tracked = fa
           </div>
         )}
         {canAddToList && (
-          <div className="w-36">
+          <div className="w-28 sm:w-36">
             <AddToListButton
               mediaId={media.id}
               title={title}
