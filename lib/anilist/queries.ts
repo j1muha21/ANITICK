@@ -93,6 +93,31 @@ export const SEASONAL_QUERY = /* GraphQL */ `
   ${MEDIA_CARD_FIELDS}
 `;
 
+export const CALENDAR_QUERY = /* GraphQL */ `
+  query Calendar($ids: [Int], $from: Int!, $to: Int!, $page: Int!) {
+    Page(page: $page, perPage: 50) {
+      pageInfo {
+        currentPage
+        hasNextPage
+      }
+      airingSchedules(mediaId_in: $ids, airingAt_greater: $from, airingAt_lesser: $to, sort: TIME) {
+        airingAt
+        episode
+        media {
+          id
+          title {
+            romaji
+            english
+          }
+          coverImage {
+            large
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const SEARCH_QUERY = /* GraphQL */ `
   query Search($q: String!) {
     Page(page: 1, perPage: 30) {

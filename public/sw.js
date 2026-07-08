@@ -1,5 +1,5 @@
 /* AniTick service worker: offline shell + last-fetched pages. */
-const CACHE = "anitick-v1";
+const CACHE = "anitick-v2";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(["/"])));
